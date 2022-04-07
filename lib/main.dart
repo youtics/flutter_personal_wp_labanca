@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress/flutter_wordpress.dart' as wp;
-
+import 'package:transparent_image/transparent_image.dart';
 import 'apis/wordpress.dart';
 
 void main() {
@@ -40,28 +40,31 @@ class HomePage extends StatelessWidget {
             return ListView.separated(
                 separatorBuilder: (context, index) => Divider(),
                 itemCount: posts.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   Map post = snapshot.data[index];
+                  //print(snapshot.data![index]["_embedded"]["wp:featuredmedia"]
+                  //[0]["source_url"]);
                   return Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       children: <Widget>[
-                        FadeInImage(
-                          placeholder: AssetImage('assets/dinero.jpg'),
-                          image: AssetImage('assets/dinero.jpg'),
-                        ),
-                        /*image: NetworkImage(post["_embedded"]
-                                    ["wp:featuredmedia"][0]["media_details"]
-                                ["sizes"]["thumbnail"]["source_url"])),*/
-                        Text(
-                          post['title']['rendered'],
-                          style: TextStyle(
-                            fontSize: 24,
+                        new FadeInImage.memoryNetwork(
+                            placeholder: kTransparentImage,
+                            image: posts[index]["featured_media"] != 0
+                                ? posts[index]["_embedded"]["wp:featuredmedia"]
+                                    [0]["source_url"]
+                                : "https://labancaria.obliviondev.com.ar/wp-content/uploads/2022/02/GRIS-SUAVE.png"),
+                        new Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: new ListTile(
+                            title: new Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10.0),
+                                child: new Text(
+                                    posts[index]["title"]["rendered"])),
+                            subtitle: new Text(posts[index]["excerpt"]
+                                    ["rendered"]
+                                .replaceAll(new RegExp(r'<[^>]*>'), '')),
                           ),
-                        ),
-                        Text(
-                          post['content']['rendered'],
-                          maxLines: 3,
                         )
                       ],
                     ),
