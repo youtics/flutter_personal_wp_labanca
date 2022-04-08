@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress/flutter_wordpress.dart' as wp;
+import 'package:flutter_wp_labancaria/screens/post.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'apis/wordpress.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,12 +21,18 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: HomePage(),
+      initialRoute: HomePage.routeName,
+      routes: {
+        HomePage.routeName: (BuildContext context) => HomePage(),
+        DetallePost.routeName: (BuildContext context) => DetallePost()
+      },
     );
   }
 }
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
+  static const routeName = 'home';
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -42,31 +50,33 @@ class HomePage extends StatelessWidget {
                 itemCount: posts.length,
                 itemBuilder: (BuildContext context, int index) {
                   Map post = snapshot.data[index];
-                  //print(snapshot.data![index]["_embedded"]["wp:featuredmedia"]
-                  //[0]["source_url"]);
-                  return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: <Widget>[
-                        new FadeInImage.memoryNetwork(
-                            placeholder: kTransparentImage,
-                            image: posts[index]["featured_media"] != 0
-                                ? posts[index]["_embedded"]["wp:featuredmedia"]
-                                    [0]["source_url"]
-                                : "https://labancaria.obliviondev.com.ar/wp-content/uploads/2022/02/GRIS-SUAVE.png"),
-                        new Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: new ListTile(
-                            title: new Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10.0),
-                                child: new Text(
-                                    posts[index]["title"]["rendered"])),
-                            subtitle: new Text(posts[index]["excerpt"]
-                                    ["rendered"]
-                                .replaceAll(new RegExp(r'<[^>]*>'), '')),
+                  return GestureDetector(
+                    onTap: () => Navigator.of(context)
+                        .pushNamed(DetallePost.routeName, arguments: post),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: <Widget>[
+                          new FadeInImage.memoryNetwork(
+                              placeholder: kTransparentImage,
+                              image: posts[index]["featured_media"] != 0
+                                  ? posts[index]["_embedded"]
+                                      ["wp:featuredmedia"][0]["source_url"]
+                                  : "https://labancaria.obliviondev.com.ar/wp-content/uploads/2022/02/GRIS-SUAVE.png"),
+                          new Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: new ListTile(
+                              title: new Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                                  child: new Text(
+                                      posts[index]["title"]["rendered"])),
+                              subtitle: new Text(posts[index]["excerpt"]
+                                      ["rendered"]
+                                  .replaceAll(new RegExp(r'<[^>]*>'), '')),
+                            ),
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 });
